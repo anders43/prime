@@ -19,6 +19,7 @@
 #include <vector>
 #include <cctype>
 #include <iterator>
+#include <optional>
 
 namespace
 {
@@ -172,7 +173,7 @@ std::vector<long long> generatePrimes()
 
   for (long long n : candidates)
   {
-    if (n > 1)
+    if (n > 1) // 1 not a prime number
     {
       primes.emplace_back(n);
     }
@@ -363,13 +364,11 @@ std::pair<std::vector<long long>, std::vector<long long>>
 
     // return new vectors.
     return std::make_pair(leftn, leftd);
-    // numerator = leftn;
-    // denominator = leftd;
   }
-
-  std::vector<long long> leftd;
-  std::vector<long long> leftn;
-  return std::make_pair(leftn, leftd);
+  else
+  {
+    return std::make_pair(numerator, denominator);
+  }
 }
 
 //////////////////////////////////////////////////////////////////
