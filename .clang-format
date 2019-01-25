@@ -1,0 +1,81 @@
+# https://clang.llvm.org/docs/ClangFormatStyleOptions.html
+AccessModifierOffset: -2
+AlignAfterOpenBracket: AlwaysBreak
+AlignEscapedNewlinesLeft: true
+AlignTrailingComments: true
+AllowAllParametersOfDeclarationOnNextLine: true
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: false
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+# AlwaysBreakAfterReturnType: All
+AlwaysBreakBeforeMultilineStrings: true
+AlwaysBreakTemplateDeclarations: true
+BinPackParameters: false
+BreakBeforeBinaryOperators: false
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterClass: true
+  AfterControlStatement: true
+  AfterEnum: true
+  AfterExternBlock: true
+  AfterFunction: true
+  AfterNamespace: true
+  AfterStruct: true
+  AfterUnion: true
+  BeforeCatch: true
+  BeforeElse: true
+  IndentBraces: false
+  SplitEmptyFunction: false
+  SplitEmptyRecord: false
+  SplitEmptyNamespace: false
+BreakBeforeBinaryOperators: All
+BreakBeforeTernaryOperators: false
+BreakConstructorInitializers: BeforeComma
+BreakConstructorInitializersBeforeComma: true
+BreakInheritanceList: BeforeComma
+BreakStringLiterals: false
+ColumnLimit: 110
+CommentPragmas: ''
+CompactNamespaces: false
+ConstructorInitializerAllOnOneLineOrOnePerLine: true
+ConstructorInitializerIndentWidth: 0
+ContinuationIndentWidth: 2
+Cpp11BracedListStyle: true
+DerivePointerAlignment: true
+DerivePointerBinding: false
+FixNamespaceComments: true
+IndentCaseLabels: false
+IndentPPDirectives: AfterHash
+IndentFunctionDeclarationAfterType: false
+IndentWrappedFunctionNames: true
+IndentWidth: 2
+Language: Cpp
+MaxEmptyLinesToKeep: 1
+NamespaceIndentation: All
+ObjCSpaceAfterProperty: true
+ObjCSpaceBeforeProtocolList: true
+PenaltyBreakBeforeFirstCallParameter: 100
+PenaltyBreakComment: 100
+PenaltyBreakFirstLessLess: 0
+PenaltyBreakString: 100
+PenaltyExcessCharacter: 1
+PenaltyReturnTypeOnItsOwnLine: 20
+PointerAlignment: Left
+PointerBindsToType: true
+ReflowComments: true
+SortIncludes: false
+SortUsingDeclarations: false
+SpaceBeforeAssignmentOperators: true
+# SpaceBeforeCtorInitializerColon: true
+# SpaceBeforeCpp11BracedList: true
+SpaceBeforeParens: true
+SpaceInEmptyParentheses: false
+SpacesBeforeTrailingComments: 1
+SpacesInAngles: false
+SpacesInCStyleCastParentheses: false
+SpacesInContainerLiterals: false
+SpacesInParentheses: false
+Standard: Cpp11
+TabWidth: 2
+UseTab: Never
