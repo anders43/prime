@@ -30,9 +30,9 @@ bool verifyFunctionality();
 
 std::vector<long long> generatePrimes();
 std::pair<long long, long long>
-  decimalToFraction(const std::string& number, std::vector<long long>& primes, const bool output = true);
+  decimalToFraction(const std::string& number, const std::vector<long long>& primes, const bool output = true);
 std::map<long long, long long>
-  factorizeNumber(const std::string& number, std::vector<long long>& primes, const bool output = true);
+  factorizeNumber(const std::string& number, const std::vector<long long>& primes, const bool output = true);
 void printSyntax();
 
 int main(int argc, char* argv[])
@@ -61,7 +61,7 @@ int main(int argc, char* argv[])
           {
             number = param;
           }
-          else if (isdigit(param[0]) && stoll(param) != 0)
+          else if (isdigit(static_cast<unsigned char>(param.at(0))) && stoll(param) != 0)
           {
             calculatePrimeNumber = true;
             number = param;
@@ -72,9 +72,9 @@ int main(int argc, char* argv[])
               return -2;
             }
           }
-          else if (param[0] == '-' && param.length() > 1)
+          else if (param.at(0) == '-' && param.length() > 1)
           {
-            trace = (std::tolower(param[1]) == 't' || std::tolower(param[1]) == 'v');
+            trace = (std::tolower(param.at(1)) == 't' || std::tolower(param.at(1)) == 'v');
           }
           else
           {
@@ -95,7 +95,7 @@ int main(int argc, char* argv[])
     }
     else
     {
-      factorizeNumber(number, primes);
+      [[maybe_unused]] auto m = factorizeNumber(number, primes);
     }
   }
   catch (const std::invalid_argument& ex)
@@ -150,7 +150,7 @@ void printSyntax()
  */
 std::vector<long long> generatePrimes()
 {
-  auto start = std::chrono::system_clock::now();
+  const auto start = std::chrono::system_clock::now();
   std::vector<long long> primes;
   const auto primeCandidates = 999'999U;
   std::vector<long long> candidates(primeCandidates);
@@ -162,7 +162,7 @@ std::vector<long long> generatePrimes()
     {
       if (i * j <= primeCandidates)
       {
-        candidates[i * j - 1] = 0ll;
+        candidates.at(i * j - 1) = 0ll;
       }
       else
       {
@@ -182,7 +182,7 @@ std::vector<long long> generatePrimes()
   if (trace)
   {
     using namespace std::chrono;
-    auto stop = system_clock::now();
+    const auto stop = system_clock::now();
 
     std::cout << "Calculated " << primes.size() << " prime numbers using 'Sieve of Eratosthenes'"
               << " which took " << std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count()
@@ -247,7 +247,7 @@ bool extractNumeratorDenominator(std::string line, long long& numerator, long lo
   bool ok = true;
   try
   {
-    auto pos = line.find('.');
+    const auto pos = line.find('.');
 
     if (pos != 0 && line.length() - pos >= 9)
     {
@@ -257,7 +257,7 @@ bool extractNumeratorDenominator(std::string line, long long& numerator, long lo
     int m = (pos != 0) ? std::stoi(line.substr(0, pos)) : 0; // 2.25 -> m = 2   .25 -> m = 0
     line = line.substr(pos);
 
-    auto len = line.length(); // .12 = 3
+    const auto len = line.length(); // .12 = 3
 
     denominator = 1; // namnare
     for (size_t i = 1; i < len; ++i)
@@ -268,9 +268,12 @@ bool extractNumeratorDenominator(std::string line, long long& numerator, long lo
     numerator = stoi(line.substr(1, len - 1)); // taljare.
     numerator += denominator * m;
   }
-  catch (std::out_of_range& ex)
+  catch (const std::out_of_range& ex)
   {
-    std::cout << "number has too many digits " << ex.what() << std::endl;
+    if (ex.what() != nullptr)
+    {
+      std::cout << "number has too many digits " << ex.what() << std::endl;
+    }
     ok = false;
   }
   return ok;
@@ -279,7 +282,7 @@ bool extractNumeratorDenominator(std::string line, long long& numerator, long lo
 /**
  * Given factors, calculate product
  */
-long long calculateProduct(std::vector<long long>& factors)
+inline long long calculateProduct(std::vector<long long>& factors) noexcept
 {
   long long n = 1;
   for (auto i : factors)
@@ -298,7 +301,7 @@ long long calculateProduct(std::vector<long long>& factors)
  * --> {1,3} {4,5}
  */
 std::pair<std::vector<long long>, std::vector<long long>>
-  removeCommonNumbers(std::vector<long long>& numerator, std::vector<long long>& denominator)
+  removeCommonNumbers(const std::vector<long long>& numerator, const std::vector<long long>& denominator)
 {
   std::vector<long long> inter;
 
@@ -344,7 +347,7 @@ std::pair<std::vector<long long>, std::vector<long long>>
 
     // remove elements from denominator vector
     std::vector<long long> leftd;
-    set_difference(
+    std::set_difference(
       denominator.begin(), denominator.end(), inter.begin(), inter.end(), std::inserter(leftd, leftd.begin()));
 
     if (leftd.size() == 0)
@@ -375,7 +378,7 @@ std::pair<std::vector<long long>, std::vector<long long>>
 // main functions
 //////////////////////////////////////////////////////////////////
 
-std::pair<long long, long long> decimalToFraction(const std::string& number, std::vector<long long>& primes, const bool output)
+std::pair<long long, long long> decimalToFraction(const std::string& number, const std::vector<long long>& primes, const bool output)
 {
   long long numerator = 1;
   long long denominator = 1;
@@ -418,8 +421,8 @@ std::pair<long long, long long> decimalToFraction(const std::string& number, std
   }
 
   // after removing common numbers, recalculate denominator and numerator
-  auto t = calculateProduct(num);
-  auto n = calculateProduct(den);
+  const auto t = calculateProduct(num);
+  const auto n = calculateProduct(den);
 
   if (output)
   {
@@ -442,9 +445,9 @@ std::pair<long long, long long> decimalToFraction(const std::string& number, std
 
 //////////////////////////////////////////////////////////////////
 
-std::map<long long, long long> factorizeNumber(const std::string& number, std::vector<long long>& primes, const bool output)
+std::map<long long, long long> factorizeNumber(const std::string& number, const std::vector<long long>& primes, const bool output)
 {
-  auto m = std::stoll(number);
+  const auto m = std::stoll(number);
 
   if (output)
   {
@@ -453,7 +456,7 @@ std::map<long long, long long> factorizeNumber(const std::string& number, std::v
 
   auto factors = divideWithPrimes(m, primes);
   std::map<long long, long long> factorsWithExp;
-  for (long long i : factors)
+  for (auto i : factors)
   {
     auto it = factorsWithExp.find(i);
     if (it != factorsWithExp.end())
@@ -523,7 +526,7 @@ bool verifyFunctionality()
   }
 
   const bool output = false;
-  auto [t, n] = decimalToFraction(std::string("0.12"), primes, output);
+  const auto&& [t, n] = decimalToFraction(std::string("0.12"), primes, output);
   if (t != 3)
   {
     std::cerr << "Invalid denominator" << std::endl;
