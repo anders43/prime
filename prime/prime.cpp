@@ -7,20 +7,6 @@
  * Anders Karlsson 2015-2017
  */
 
-#include <algorithm>
-#include <cassert>
-#include <chrono>
-#include <iomanip>
-#include <iostream>
-#include <limits>
-#include <map>
-#include <numeric> // iota
-#include <string>
-#include <vector>
-#include <cctype>
-#include <iterator>
-#include <optional>
-
 namespace
 {
   static bool trace = false;
@@ -33,9 +19,9 @@ std::pair<long long, long long>
   decimalToFraction(const std::string& number, const std::vector<long long>& primes, const bool output = true);
 std::map<long long, long long>
   factorizeNumber(const std::string& number, const std::vector<long long>& primes, const bool output = true);
-void printSyntax();
+void printSyntax() noexcept;
 
-int main(int argc, char* argv[])
+int main(int argc, char* argv[]) noexcept try
 {
   std::string number;
 
@@ -43,7 +29,7 @@ int main(int argc, char* argv[])
 
   try
   {
-    bool calculatePrimeNumber = false;
+    auto calculatePrimeNumber{false};
     if (argc == 1)
     {
       std::cout << "Enter an integer number to factorize into prime numbers:" << std::flush;
@@ -54,7 +40,7 @@ int main(int argc, char* argv[])
     {
       while (--argc)
       {
-        std::string param(*++argv);
+        std::string param{*++argv};
         if (!param.empty())
         {
           if (param.find('.') != std::string::npos)
@@ -87,7 +73,7 @@ int main(int argc, char* argv[])
     }
 
     // generate some primes using Eratosthenes method
-    auto primes = generatePrimes();
+    const auto primes = generatePrimes();
 
     if (!calculatePrimeNumber) // from decimal to fraction e.g. 2.25 => 2 1/4
     {
@@ -108,8 +94,12 @@ int main(int argc, char* argv[])
   }
   return 0;
 }
+catch(const std::exception& ex)
+{
+  std::cerr << ex.what() << std::endl;
+}  
 
-void printSyntax()
+void printSyntax() noexcept try
 {
   using std::cout;
   using std::endl;
@@ -122,6 +112,10 @@ void printSyntax()
   cout << "  C>prime 1234 will give 2*617 (prime numbers)" << endl;
   cout << "  C>prime 12.25 will give 12 1/4 (fractions)" << endl;
 }
+catch(const std::exception& ex)
+{
+  std::cerr << ex.what() << std::endl;
+}  
 
 /**
  * Good old Eratosthenes way of calculating prime numbers, the method can
@@ -156,9 +150,12 @@ std::vector<long long> generatePrimes()
   std::vector<long long> candidates(primeCandidates);
   std::iota(std::begin(candidates), std::end(candidates), 1ll); // vector with 1,2, ... primeCandidates
 
-  for (auto i = 2U; i < candidates.size(); ++i)
+  // use the correct type 
+  using sz = std::vector<long long>::size_type;
+
+  for ( sz i = 2ul; i < candidates.size(); ++i)
   {
-    for (auto j = 2U; j < candidates.size(); ++j)
+    for ( sz j = 2ul; j < candidates.size(); ++j)
     {
       if (i * j <= primeCandidates)
       {
@@ -171,7 +168,7 @@ std::vector<long long> generatePrimes()
     }
   }
 
-  for (long long n : candidates)
+  for (auto n : candidates)
   {
     if (n > 1) // 1 not a prime number
     {
@@ -322,14 +319,14 @@ std::pair<std::vector<long long>, std::vector<long long>>
   }
 
   // are there any common numbers? if not we return vectors as is.
-  if (inter.size() != 0)
+  if (!inter.empty())
   {
     // remove elements from numerator vector
     std::vector<long long> leftn;
     std::set_difference(
       numerator.begin(), numerator.end(), inter.begin(), inter.end(), std::inserter(leftn, leftn.begin()));
 
-    if (leftn.size() == 0)
+    if (leftn.empty())
     {
       leftn.push_back(1);
     }
@@ -350,7 +347,7 @@ std::pair<std::vector<long long>, std::vector<long long>>
     std::set_difference(
       denominator.begin(), denominator.end(), inter.begin(), inter.end(), std::inserter(leftd, leftd.begin()));
 
-    if (leftd.size() == 0)
+    if (leftd.empty())
     {
       leftd.push_back(1);
     }
@@ -396,21 +393,21 @@ std::pair<long long, long long> decimalToFraction(const std::string& number, con
   }
 
   // divide numerator and denominator into primes
-  auto factorsnumerator = divideWithPrimes(numerator, primes);
-  auto factorsdenominator = divideWithPrimes(denominator, primes);
+  auto factorsNumerator = divideWithPrimes(numerator, primes);
+  auto factorsDenominator = divideWithPrimes(denominator, primes);
 
   if (trace)
   {
     std::cout << "calculate prime numbers for numerator and denominator" << std::endl;
-    printFactors(factorsnumerator);
+    printFactors(factorsNumerator);
     std::cout << "--------------------------" << std::endl;
-    printFactors(factorsdenominator);
+    printFactors(factorsDenominator);
     std::cout << std::endl;
   }
 
   // given the vectors of primes, remove common ones from numerator and
   // denominator
-  auto [num, den] = removeCommonNumbers(factorsnumerator, factorsdenominator);
+  auto [num, den] = removeCommonNumbers(factorsNumerator, factorsDenominator);
 
   if (trace)
   {
@@ -471,21 +468,23 @@ std::map<long long, long long> factorizeNumber(const std::string& number, const 
 
   if (output)
   {
-    int count = 0; // number of factors printed
+    auto count = 0; // number of factors printed
     for (auto n : factorsWithExp)
     {
       if (count++ > 0)
       {
-        std::cout << "* ";
+        fmt::print(fg(fmt::color::gray), "*");
       }
 
       if (n.second != 1)
       {
-        std::cout << n.first << "^" << n.second << " ";
+        fmt::print(fg(fmt::color::white),"{}", n.first);
+        fmt::print(fg(fmt::color::red),"^");
+        fmt::print(fg(fmt::color::yellow),"{}", n.second);
       }
       else
       {
-        std::cout << n.first;
+        fmt::print(fg(fmt::color::white),"{}", n.first);
       }
     }
 
